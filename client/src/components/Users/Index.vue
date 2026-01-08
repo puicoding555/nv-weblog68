@@ -1,24 +1,11 @@
 <template>
   <div>
     <h1>Get All Users</h1>
+    <p><button @click="goCreate"> Create User </button></p>
 
-    <p>
-      <button @click="goCreate">
-        Create User
-      </button>
-    </p>
+    <p><button @click="goEdit">Edit User</button></p>
 
-    <p>
-      <button @click="goEdit">
-        Edit User
-      </button>
-    </p>
-
-    <p>
-      <button @click="goShow">
-        Show User
-      </button>
-    </p>
+    <p><button @click="goShow">Show User</button></p>
   </div>
 </template>
 
