@@ -1,27 +1,63 @@
-<template>
+<template> 
   <div>
     <h1>Get All Users</h1>
-    <p><button @click="goCreate"> Create User </button></p>
 
-    <p><button @click="goEdit">Edit User</button></p>
+    <h4>จำนวนผู้ใช้งาน: {{ users.length }}</h4>
 
-    <p><button @click="goShow">Show User</button></p>
+    <div v-for="user in users" :key="user.id">
+      <p>id: {{ user.id }}</p>
+      <p>ชื่อ-นามสกุล: {{ user.name }} - {{ user.lastname }}</p>
+      <p>email: {{ user.email }}</p>
+      <p>password: {{ user.password }}</p>
+
+      <button @click="goShow(user.id)">ดูข้อมูลผู้ใช้</button> 
+
+      <hr>
+    </div>
+
+    <button @click="goCreate">Create User</button> 
+    
   </div>
 </template>
 
 <script>
+import UsersService from '../../services/UsersService'
+
+
 export default {
+  data () {
+    return {
+      users: []            // เก็บข้อมูลจาก Server
+    }
+  },
+
+  async created () {
+  try {
+    const response = await UsersService.index()
+    console.log(response)
+    this.users = response.data
+  } catch (error) {
+    console.log(error)
+  }
+},
+
   methods: {
   goCreate () {
-    this.$router.push('/user/create')
+    this.$router.push({ name: 'user-create' })
   },
-  goEdit () {
-    this.$router.push('/user/edit/1')   // ส่ง userId = 1
+  goShow (userId) {
+    this.$router.push({
+      name: 'user-show',
+      params: { userId }
+    })
   },
-  goShow () {
-    this.$router.push('/user/1')        // ส่ง userId = 1
+  goEdit (userId) {
+    this.$router.push({
+      name: 'user-edit',
+      params: { userId }
+    })
   }
-    }
+  }
 }
 </script>
 
