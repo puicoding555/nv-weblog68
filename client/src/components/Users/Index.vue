@@ -6,7 +6,7 @@
 
     <div v-for="user in users" :key="user.id">
       <p>id: {{ user.id }}</p>
-      <p>ชื่อ-นามสกุล: {{ user.name }} - {{ user.lastname }}</p>
+      <p>ชื่อ-นามสกุล: {{ user.name }} {{ user.lastname }}</p>
       <p>email: {{ user.email }}</p>
       <p>password: {{ user.password }}</p>
 

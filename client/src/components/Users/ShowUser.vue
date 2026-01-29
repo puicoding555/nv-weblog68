@@ -4,7 +4,7 @@
 
     <div v-if="user">
       <p>id: {{ user.id }}</p>
-      <p>ชื่อ-นามสกุล: {{ user.name }} - {{ user.lastname }}</p>
+      <p>ชื่อ-นามสกุล: {{ user.name }} {{ user.lastname }}</p>
       <p>email: {{ user.email }}</p>
       <p>password: {{ user.password }}</p>
     </div>
