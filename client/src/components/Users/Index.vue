@@ -11,6 +11,8 @@
       <p>password: {{ user.password }}</p>
 
       <button @click="goShow(user.id)">ดูข้อมูลผู้ใช้</button> 
+      <button @click="goEdit(user.id)">แก้ไข</button>
+      <button v-on:click="deleteUser(user)">ลบข้อมูล</button>
 
       <hr>
     </div>
@@ -23,42 +25,53 @@
 <script>
 import UsersService from '../../services/UsersService'
 
-
 export default {
   data () {
     return {
-      users: []            // เก็บข้อมูลจาก Server
+      users: []
+    }
+  },
+  async created () {
+    this.refreshData()
+  },
+  methods: {
+  async deleteUser (user) {
+    let result = confirm("Want to delete?")
+    if (result) {
+      try {
+        await UsersService.delete(user)
+        await this.refreshData()
+      } catch (err) {
+        console.log(err)
+      }
     }
   },
 
-  async created () {
-  try {
-    const response = await UsersService.index()
-    console.log(response)
-    this.users = response.data
-  } catch (error) {
-    console.log(error)
-  }
-},
-
-  methods: {
-  goCreate () {
-    this.$router.push({ name: 'user-create' })
+  async refreshData () {
+    this.users = (await UsersService.index()).data
   },
+
   goShow (userId) {
     this.$router.push({
       name: 'user-show',
       params: { userId }
     })
   },
+
   goEdit (userId) {
     this.$router.push({
       name: 'user-edit',
       params: { userId }
     })
-  }
+  },
+
+  goCreate () {
+    this.$router.push({ name: 'user-create' })
   }
 }
+
+}
+
 </script>
 
 <style scoped>
