@@ -1,35 +1,66 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// User Components
+// Auth
+import Login from '../views/Login.vue'
+
+// Users
 import UserIndex from '../components/Users/Index.vue'
 import UserCreate from '../components/Users/CreateUser.vue'
 import UserEdit from '../components/Users/EditUser.vue'
 import UserShow from '../components/Users/ShowUser.vue'
 
+const routes = [
+  { path: '/', redirect: '/login' },
+
+  {
+    path: '/login',
+    name: 'login',
+    component: Login
+  },
+
+  {
+    path: '/users',
+    name: 'users',
+    component: UserIndex,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user/create',
+    name: 'user-create',
+    component: UserCreate,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user/edit/:userId',
+    name: 'user-edit',
+    component: UserEdit,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user/:userId',
+    name: 'user-show',
+    component: UserShow,
+    meta: { requiresAuth: true }
+  }
+]
+
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: '/users',
-      name: 'users',
-      component: UserIndex
-    },
-    {
-      path: '/user/create',
-      name: 'user-create',
-      component: UserCreate
-    },
-    {
-      path: '/user/edit/:userId',
-      name: 'user-edit',
-      component: UserEdit
-    },
-    {
-      path: '/user/:userId',
-      name: 'user-show',
-      component: UserShow
+  routes
+})
+
+// 🔐 Auth Guard
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      next('/login')
+    } else {
+      next()
     }
-  ]
+  } else {
+    next()
+  }
 })
 
 export default router
