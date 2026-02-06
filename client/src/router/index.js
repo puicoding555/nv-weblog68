@@ -1,23 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Auth
-import Login from '../views/Login.vue'
+// Auth View
+import Login from '../components/views/Login.vue'
 
-// Users
+// User Components
 import UserIndex from '../components/Users/Index.vue'
 import UserCreate from '../components/Users/CreateUser.vue'
 import UserEdit from '../components/Users/EditUser.vue'
 import UserShow from '../components/Users/ShowUser.vue'
 
 const routes = [
-  { path: '/', redirect: '/login' },
-
+  {
+    path: '/',
+    redirect: '/login'
+  },
   {
     path: '/login',
     name: 'login',
     component: Login
   },
-
   {
     path: '/users',
     name: 'users',
@@ -49,9 +50,8 @@ const router = createRouter({
   routes
 })
 
-// 🔐 Auth Guard
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
+  if (to.matched.some(r => r.meta.requiresAuth)) {
     const token = localStorage.getItem('token')
     if (!token) {
       next('/login')
