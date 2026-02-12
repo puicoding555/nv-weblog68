@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     name: DataTypes.STRING,
     lastname: DataTypes.STRING,
-    status: DataTypes.STRING
+    role: {
+  type: DataTypes.STRING,
+  defaultValue: 'user'
+  }
+
   })
 
   User.beforeCreate(async (user) => {

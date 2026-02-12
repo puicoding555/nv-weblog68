@@ -11,17 +11,28 @@ function jwtSignUser (user) {
 }
 
 module.exports = {
-  // POST /register
-  async register (req, res) {
-    try {
-      const user = await User.create(req.body)
-      res.send(user)
-    } catch (err) {
-      res.status(400).send({
-        error: 'Register failed'
-      })
-    }
-  },
+// POST /register
+async register (req, res) {
+  try {
+    const { email, password, name, lastname } = req.body
+
+    const user = await User.create({
+      email,
+      password,
+      name,
+      lastname,
+      role: 'user',      // บังคับเป็น user
+      status: 'Active'
+    })
+
+    res.send(user)
+  } catch (err) {
+    console.error(err)
+    res.status(400).send({
+      error: 'Register failed'
+    })
+  }
+},
 
   // POST /login
   async login (req, res) {

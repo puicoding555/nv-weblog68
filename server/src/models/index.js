@@ -14,5 +14,6 @@ db.Sequelize = Sequelize
 db.sequelize = sequelize
 
 db.User = require('./User')(sequelize, Sequelize.DataTypes)
+db.Blog = require('./Blog')(sequelize, Sequelize.DataTypes)
 
 module.exports = db
