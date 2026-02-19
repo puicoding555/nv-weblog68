@@ -1,27 +1,38 @@
+const isAuthenController = require('./controllers/isAuthenController')
 const UserController = require('./controllers/UserController')
 const UserAuthenController = require('./controllers/UserAuthenController')
 const BlogController = require('./controllers/BlogController')
-
-const isAuthenticated = require('./policies/isAuthenticated')
-const isAdmin = require('./policies/isAdmin')
+// const UploadController = require('./controllers/UploadController')
+// const fileUploadMiddleware = require('./middleware/fileUpload') // Import Middleware
 
 module.exports = (app) => {
-  // Auth
-  app.post('/register', UserAuthenController.register)
+  // เส้นทางเดิมจากบทที่ 4 (ถ้าอยากเก็บไว้)
+  // app.get('/status', (req, res) => res.send('server is running'))
+  // เส้นทางใหม่สำหรับ User Management แบบ MVC
+  app.get('/users', isAuthenController, UserController.index)
+  app.post('/user', UserController.create)
+  app.put('/user/:userId', UserController.put)
+  app.delete('/user/:userId', UserController.remove)
+  app.get('/user/:userId', UserController.show)
   app.post('/login', UserAuthenController.login)
+  app.post('/register', UserAuthenController.register)
+  // blog route
+  // create blog
+  app.post('/blog', BlogController.create)
 
-  // Users
-  app.get('/users', isAuthenticated, isAdmin, UserController.index)
-  app.get('/user/:userId', isAuthenticated, UserController.show)
-  app.post('/user',isAuthenticated, isAdmin, UserController.create)
-  app.put('/user/:userId', isAuthenticated, isAdmin, UserController.put)  
-  app.delete('/user/:userId', isAuthenticated, isAdmin, UserController.remove)
+  // edit blog, suspend, active
+  app.put('/blog/:blogId', BlogController.put)
 
-  // Blogs
-  app.get('/blogs', BlogController.index)
+  // delete blog
+  app.delete('/blog/:blogId', BlogController.remove)
+
+  // get blog by id
   app.get('/blog/:blogId', BlogController.show)
-  app.post('/blog', isAuthenticated, isAdmin, BlogController.create)
-  app.put('/blog/:blogId', isAuthenticated, isAdmin, BlogController.put)
-  app.delete('/blog/:blogId', isAuthenticated, isAdmin, BlogController.remove)
 
+  // get all blog
+  app.get('/blogs', BlogController.index)
+  
+  // Route สำหรับ Upload โดยเฉพาะ
+  // logic: เรียก middleware ก่อน -> ถ้าผ่าน -> เรียก controller
+  // app.post('/upload', fileUploadMiddleware, UploadController.upload)
 }

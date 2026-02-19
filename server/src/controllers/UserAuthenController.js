@@ -1,75 +1,59 @@
 const { User } = require('../models')
-const jwt = require('jsonwebtoken')
 const config = require('../config/config')
+const jwt = require('jsonwebtoken')
 
 function jwtSignUser (user) {
-  return jwt.sign(
-    user,
-    config.authentication.jwtSecret,
-    { expiresIn: '7d' }
-  )
+    const ONE_WEEK = 60 * 60 * 24 * 7
+    return jwt.sign(user, config.authentication.jwtSecret, {
+        expiresIn: ONE_WEEK
+    })
 }
 
 module.exports = {
-// POST /register
-async register (req, res) {
-  try {
-    const { email, password, name, lastname } = req.body
+    async register (req, res) {
+        try {
+            const user = await User.create(req.body)
+            res.send(user.toJSON())
+        } catch (error) {
+            console.error(error)
+            res.status(400).send({
+                error: 'The content information was incorrect'
+            })
+        }
+    },
+    
+    async login (req, res) {
+        try {
+            const {email, password} = req.body
+            const user = await User.findOne({
+                where: {
+                    email: email
+                }
+            })
+            
+            if(!user) {
+                return res.status(403).send({
+                    error: 'User/Password not correct'
+                })
+            }
 
-    const user = await User.create({
-      email,
-      password,
-      name,
-      lastname,
-      role: 'user',      // บังคับเป็น user
-      status: 'Active'
-    })
+            const isPasswordValid = await user.comparePassword(password)
+            if (!isPasswordValid) {
+                return res.status(403).send({
+                    error: 'User/Password not correct'
+                })
+            }
 
-    res.send(user)
-  } catch (err) {
-    console.error(err)
-    res.status(400).send({
-      error: 'Register failed'
-    })
-  }
-},
-
-  // POST /login
-  async login (req, res) {
-    try {
-      const { email, password } = req.body
-
-      const user = await User.findOne({
-        where: { email }
-      })
-
-      // เช็ก user ไม่เจอ
-      if (!user) {
-        return res.status(403).send({
-          error: 'User not found'
-        })
-      }
-
-      // compare password
-      const isValid = await user.comparePassword(password)
-
-      if (!isValid) {
-        return res.status(403).send({
-          error: 'Password incorrect'
-        })
-      }
-
-      const userJSON = user.toJSON()
-
-      res.send({
-        user: userJSON,
-        token: jwtSignUser(userJSON)
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send({
-        error: 'Login error'
-      })
+            const userJSON = user.toJSON()
+            res.send({
+                user: userJSON,
+                token: jwtSignUser(userJSON)
+            })
+        } catch (error) {
+            console.error(error)
+            res.status(500).send({
+                error: 'Error! from get user'
+            })
+        }
     }
-  }
 }

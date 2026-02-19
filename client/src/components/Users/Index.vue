@@ -1,81 +1,68 @@
-<template> 
+<template>
   <div>
-    <h1>Get All Users</h1>
-
-    <h4>จำนวนผู้ใช้งาน: {{ users.length }}</h4>
-
-    <div v-for="user in users" :key="user.id">
+    <h2>Get all users</h2>
+    <p><button v-on:click="logout2()">Logout</button></p>
+    <p><button v-on:click="navigateTo('/user/create')">สร้างผู้ใช้</button></p>
+    <h4>จำนวนผู้ใช้งาน {{ users.length }}</h4>
+    <div v-for="user in users" v-bind:key="user.id">
       <p>id: {{ user.id }}</p>
-      <p>ชื่อ-นามสกุล: {{ user.name }} {{ user.lastname }}</p>
+      <p>ชื่อ-นามสกุล: {{ user.name }} - {{ user.lastname }}</p>
       <p>email: {{ user.email }}</p>
       <p>password: {{ user.password }}</p>
-
-      <button @click="goShow(user.id)">ดูข้อมูลผู้ใช้</button> 
-      <button @click="goEdit(user.id)">แก้ไข</button>
-      <button v-on:click="deleteUser(user)">ลบข้อมูล</button>
-
+      <p><button v-on:click="navigateTo('/user/' + user.id)">ดูข้อมูลผู้ใช้</button></p>
+      <p><button v-on:click="navigateTo('/user/edit/' + user.id)">แก้ไขข้อมูล</button></p>
+      <p><button v-on:click=deleteUser(user)>ลบข้อมูล</button></p>
       <hr>
     </div>
-
-    <button @click="goCreate">Create User</button> 
-    
   </div>
 </template>
 
 <script>
 import UsersService from '../../services/UsersService'
+import { useAuthenStore } from '../../stores/authen'
 
 export default {
-  data () {
+  data() {
     return {
       users: []
     }
   },
-  async created () {
-    this.refreshData()
-  },
-  methods: {
-  async deleteUser (user) {
-    let result = confirm("Want to delete?")
-    if (result) {
-      try {
-        await UsersService.delete(user)
-        await this.refreshData()
-      } catch (err) {
-        console.log(err)
-      }
+  async created() {
+    try {
+      this.users = (await UsersService.index()).data
+      console.log(this.users)
+    } catch (error) {
+      console.log(error)
     }
   },
 
-  async refreshData () {
-    this.users = (await UsersService.index()).data
+
+  // Logic จะเขียนตรงนี้
+  methods: {
+    navigateTo(route) {
+      this.$router.push(route);
+    },
+    async deleteUser(user) {
+      await UsersService.delete(user)
+      this.refreshData()
+    },
+    async refreshData() {
+      this.users = (await UsersService.index()).data
+    },
+    logout() {
+      const authenStore = useAuthenStore()
+      authenStore.logout() // เรียก action logout จาก store
+
+      this.$router.push({
+        name: 'login'
+      })
+    },
   },
 
-  goShow (userId) {
-    this.$router.push({
-      name: 'user-show',
-      params: { userId }
-    })
-  },
 
-  goEdit (userId) {
-    this.$router.push({
-      name: 'user-edit',
-      params: { userId }
-    })
-  },
-
-  goCreate () {
-    this.$router.push({ name: 'user-create' })
-  }
-}
-
-}
-
+};
 </script>
 
 <style scoped>
-button {
-  padding: 6px 12px;
-}
+/* CSS เฉพาะหน้านี้ */
 </style>

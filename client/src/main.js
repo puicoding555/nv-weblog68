@@ -4,15 +4,18 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
 import router from './router'
-
-import './assets/main.css'
+import BackHeader from './components/Header.vue'
+import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue'
 
 const app = createApp(App)
 const pinia = createPinia()
 
-pinia.use(piniaPluginPersistedstate) // เรียกใช้ plugin เก็บ state ลง local storage
+pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
+app.use(CkeditorPlugin) 
 app.use(router)
+
+app.component('back-header', BackHeader)
 
 app.mount('#app')
